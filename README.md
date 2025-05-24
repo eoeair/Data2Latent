@@ -18,7 +18,7 @@ To simplify, the MNIST dataset is used here.
 
 # Requirments
 
-`flax mloader scikit-learn matplotlib`
+`flax loaderx scikit-learn matplotlib`
 
 # Tutorial
 
