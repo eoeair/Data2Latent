@@ -5,9 +5,7 @@ from functools import partial
 class CNN(nnx.Module):
   """A simple CNN model."""
 
-  def __init__(self, rngs: nnx.Rngs, return_latent=True):
-    self.return_latent = return_latent
-      
+  def __init__(self, rngs: nnx.Rngs):
     self.conv1 = nnx.Conv(1, 4, kernel_size=(3, 3), rngs=rngs)
     self.conv2 = nnx.Conv(4, 2, kernel_size=(3, 3), rngs=rngs)
     self.avg_pool = partial(nnx.avg_pool, window_shape=(2, 2), strides=(2, 2))
@@ -21,7 +19,4 @@ class CNN(nnx.Module):
     x = x.reshape(x.shape[0], -1)  # flatten
     latent = self.embed(x)
     logits = self.logits(latent)
-    if self.return_latent:
-        return latent, logits
-    else:
-        return logits
+    return latent, logits
