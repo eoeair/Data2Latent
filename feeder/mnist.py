@@ -13,4 +13,4 @@ class Mnist(loaderx.Dataset):
     return len(self._data)
 
 def loader(dataset_path, data, label, batch_size, num_epoch):
-  return loaderx.DataLoader(dataset = Mnist(dataset_path, data, label),batch_size=batch_size,num_epoch=num_epoch)
+  return loaderx.DataLoader(dataset = Mnist(dataset_path, data, label),batch_size=batch_size,num_epochs=num_epoch)
