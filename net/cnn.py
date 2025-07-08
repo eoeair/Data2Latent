@@ -6,17 +6,21 @@ class CNN(nnx.Module):
   """A simple CNN model."""
 
   def __init__(self, rngs: nnx.Rngs):
-    self.conv1 = nnx.Conv(1, 4, kernel_size=(3, 3), rngs=rngs)
-    self.conv2 = nnx.Conv(4, 2, kernel_size=(3, 3), rngs=rngs)
-    self.avg_pool = partial(nnx.avg_pool, window_shape=(2, 2), strides=(2, 2))
-    self.embed = nnx.Linear(392, 2, rngs=rngs)
+    self.conv1 = nnx.Conv(1, 8, kernel_size=(9, 9), padding="SAME", rngs=rngs)
+    self.conv2 = nnx.Conv(8, 16, kernel_size=(9, 9), padding="SAME", rngs=rngs)
+    self.bn1 = nnx.BatchNorm(8, rngs=rngs)
+    self.bn2 = nnx.BatchNorm(16, rngs=rngs)
+    self.conv1 = nnx.Sequential(self.conv1,self.bn1,nnx.relu)
+    self.conv2 = nnx.Sequential(self.conv2,self.bn2,nnx.relu)
+
+    self.embed = nnx.Linear(16, 2, rngs=rngs)
     self.logits = nnx.Linear(2, 10, rngs=rngs)
 
   def __call__(self, x):
-    x = nnx.relu(self.conv1(x))
-    x = nnx.relu(self.conv2(x))
-    x = self.avg_pool(x)
-    x = x.reshape(x.shape[0], -1)  # flatten
+    x = self.conv1(x)
+    x = self.conv2(x)
+    # Global average pool
+    x = x.mean(axis=(1, 2))  
     latent = self.embed(x)
     logits = self.logits(latent)
     return latent, logits

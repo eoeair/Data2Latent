@@ -45,14 +45,14 @@ if __name__ == '__main__':
     loss=nnx.metrics.Average('loss'),
   )
   
-  train_loader = loader(dataset_path='data/mnist.npz', data='x_train', label='y_train', batch_size=batch_size, num_epoch=10)
+  train_loader = loader(dataset_path='data/mnist.npz', data='x_train', label='y_train', batch_size=batch_size, num_epoch=20)
   with ocp.CheckpointManager(
     os.path.join(os.getcwd(), 'checkpoints/'),
     options = ocp.CheckpointManagerOptions(max_to_keep=1),
     ) as mngr:
     for step, batch in enumerate(train_loader):
         train_step(model, optimizer, metrics, batch)
-        if step > 0 and step % 500 == 0:
+        if step > 0 and step % 1000 == 0:
             train_metrics = metrics.compute()
             print("Step:{}_Train Acc@1: {} loss: {} ".format(step,train_metrics['accuracy'],train_metrics['loss']))
             metrics.reset()  # Reset the metrics for the train set.
