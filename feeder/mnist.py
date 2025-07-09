@@ -1,16 +1,12 @@
 import numpy as np
-import loaderx
+from loaderx import Dataset,DataLoader
 
-class Mnist(loaderx.Dataset):
-  def __init__(self, dataset_path, data, label):
-    self._data = np.load(dataset_path)[data]
-    self._label = np.load(dataset_path)[label]
+def transform(batch):
+    return batch[0][..., None] / 255.0 , batch[1].astype(np.int32)
 
-  def __getitem__(self, idx):
-    # expand axis(-1)
-    return self._data[idx, ..., None]/np.float32(255), self._label[idx].astype(np.int32)
-  def __len__(self):
-    return len(self._data)
+class Mnist(Dataset):
+  def __init__(self, dataset_path, data, label, group_size=1):
+    super().__init__(dataset_path, data, label, group_size)
 
 def loader(dataset_path, data, label, batch_size, num_epoch):
-  return loaderx.DataLoader(dataset = Mnist(dataset_path, data, label),batch_size=batch_size,num_epochs=num_epoch)
+  return DataLoader(dataset = Mnist(dataset_path, data, label),batch_size=batch_size,num_epochs=num_epoch,transform=transform)
