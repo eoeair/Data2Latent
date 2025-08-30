@@ -20,7 +20,7 @@ def train_step(model: CNN, optimizer: nnx.Optimizer, metrics: nnx.MultiMetric, b
   grad_fn = nnx.value_and_grad(loss_fn, has_aux=True)
   (loss, logits), grads = grad_fn(model, batch)
   metrics.update(loss=loss, logits=logits, labels=batch['label'])  # In-place updates.
-  optimizer.update(grads)  # In-place updates.
+  optimizer.update(model, grads)  # In-place updates.
 
 @nnx.jit
 def eval_step(model: CNN, metrics: nnx.MultiMetric, batch):
@@ -39,7 +39,9 @@ if __name__ == '__main__':
   
   # Instantiate
   model = CNN(rngs=nnx.Rngs(0))
-  optimizer = nnx.Optimizer(model, optax.adamw(learning_rate=0.01,b1=0.9))
+  tx = optax.adamw(learning_rate=0.01,b1=0.9)
+  optimizer = nnx.Optimizer(model, tx, wrt=nnx.Param)
+
   metrics = nnx.MultiMetric(
     accuracy=nnx.metrics.Accuracy(),
     loss=nnx.metrics.Average('loss'),
