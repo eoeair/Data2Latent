@@ -1,8 +1,9 @@
 import numpy as np
+from ml_dtypes import bfloat16
 from loaderx import Dataset,DataLoader
 
 def transform(batch):
-    return batch[0][..., None] / 255.0 , batch[1].astype(np.int32)
+    return (batch[0][..., None] / 255.0).astype(bfloat16) , batch[1].astype(np.int32)
 
 class Mnist(Dataset):
   def __init__(self, dataset_path, data, label, group_size=1):

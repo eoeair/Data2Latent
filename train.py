@@ -1,4 +1,5 @@
 import os
+import jax.numpy as jnp
 # The Flax NNX API.
 from flax import nnx  
 # optimizers
@@ -38,7 +39,7 @@ if __name__ == '__main__':
   batch_size = 256
   
   # Instantiate
-  model = CNN(rngs=nnx.Rngs(0))
+  model = CNN(rngs=nnx.Rngs(0), dtype=jnp.bfloat16)
   tx = optax.adamw(learning_rate=0.01,b1=0.9)
   optimizer = nnx.Optimizer(model, tx, wrt=nnx.Param)
 
