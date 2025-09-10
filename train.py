@@ -37,9 +37,10 @@ if __name__ == '__main__':
   # hyper param
   best_acc = 0
   batch_size = 256
+  dtype = jnp.bfloat16
   
   # Instantiate
-  model = CNN(rngs=nnx.Rngs(0), dtype=jnp.bfloat16)
+  model = CNN(rngs=nnx.Rngs(0), dtype=dtype)
   tx = optax.adamw(learning_rate=0.01,b1=0.9)
   optimizer = nnx.Optimizer(model, tx, wrt=nnx.Param)
 
@@ -48,7 +49,7 @@ if __name__ == '__main__':
     loss=nnx.metrics.Average('loss'),
   )
   
-  train_loader = loader(dataset_path='data/mnist.npz', data='x_train', label='y_train', batch_size=batch_size, num_epochs=20)
+  train_loader = loader(dataset_path='data/mnist.npz', data='x_train', label='y_train', batch_size=batch_size, num_epochs=20, dtype=dtype)
   with ocp.CheckpointManager(
     os.path.join(os.getcwd(), 'checkpoints/'),
     options = ocp.CheckpointManagerOptions(max_to_keep=1),
@@ -61,7 +62,7 @@ if __name__ == '__main__':
             metrics.reset()  # Reset the metrics for the train set.
 
             # Compute the metrics on the test set after each training epoch.
-            val_loader = loader(dataset_path='data/mnist.npz', data='x_val', label='y_val', batch_size=batch_size)
+            val_loader = loader(dataset_path='data/mnist.npz', data='x_val', label='y_val', batch_size=batch_size, dtype=dtype)
             for val_batch in val_loader:
                 eval_step(model, metrics, val_batch)
             val_metrics = metrics.compute()

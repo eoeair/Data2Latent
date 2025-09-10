@@ -13,8 +13,8 @@ class CNN(nnx.Module):
     self.conv1 = nnx.Sequential(self.conv1, self.bn1, nnx.relu)
     self.conv2 = nnx.Sequential(self.conv2, self.bn2, nnx.relu)
 
-    self.embed = nnx.Linear(16, 2, rngs=rngs, dtype=dtype)
-    self.logits = nnx.Linear(2, 10, rngs=rngs, dtype=dtype)
+    self.embed = nnx.Linear(16, 2, rngs=rngs, dtype=jnp.float32)
+    self.logits = nnx.Linear(2, 10, rngs=rngs, dtype=jnp.float32)
 
   def __call__(self, x):
     x = self.conv1(x)
