@@ -49,28 +49,30 @@ if __name__ == '__main__':
     loss=nnx.metrics.Average('loss'),
   )
   
-  train_loader = loader(dataset_path='data/mnist.npz', data='x_train', label='y_train', batch_size=batch_size, num_epochs=20, dtype=dtype)
-  with ocp.CheckpointManager(
-    os.path.join(os.getcwd(), 'checkpoints/'),
-    options = ocp.CheckpointManagerOptions(max_to_keep=1),
-    ) as mngr:
-    for step, batch in enumerate(train_loader):
-        train_step(model, optimizer, metrics, batch)
-        if step > 0 and step % 1000 == 0:
-            train_metrics = metrics.compute()
-            print("Step:{}_Train Acc@1: {} loss: {} ".format(step,train_metrics['accuracy'],train_metrics['loss']))
-            metrics.reset()  # Reset the metrics for the train set.
+  train_loader = loader(data='data/x_train.npy', label='data/y_train.npy', dtype=dtype)
+  val_loader = loader(data='data/x_val.npy', label='data/y_val.npy', dtype=dtype)
 
-            # Compute the metrics on the test set after each training epoch.
-            val_loader = loader(dataset_path='data/mnist.npz', data='x_val', label='y_val', batch_size=batch_size, dtype=dtype)
-            for val_batch in val_loader:
-                eval_step(model, metrics, val_batch)
-            val_metrics = metrics.compute()
-            print("Step:{}_Val Acc@1: {} loss: {} ".format(step,val_metrics['accuracy'],val_metrics['loss']))
-            
-            # save checkpoint
-            if val_metrics['accuracy'] > best_acc:
-                best_acc = val_metrics['accuracy']
-                _, state = nnx.split(model)
-                mngr.save(step, args=ocp.args.StandardSave(state))
-            metrics.reset()  # Reset the metrics for the val set.
+  with ocp.CheckpointManager(os.path.join(os.getcwd(), 'checkpoints'), options = ocp.CheckpointManagerOptions(max_to_keep=1)) as mngr:
+    for step, train_batch in enumerate(train_loader):
+      train_step(model, optimizer, metrics, train_batch)
+      if step > 0 and step % 1000 == 0:
+        train_metrics = metrics.compute()
+        print("Step:{}_Train Acc@1: {} loss: {}".format(step,train_metrics['accuracy'],train_metrics['loss']))
+        metrics.reset()  # Reset the metrics for the train set.
+
+        # Compute the metrics on the test set after each training epoch.
+        for j, val_batch in enumerate(val_loader):
+          eval_step(model, metrics, val_batch)
+          if j % 200 == 0:
+            break
+        val_metrics = metrics.compute()
+        print("Step:{}_Val Acc@1: {} loss: {} ".format(step,val_metrics['accuracy'],val_metrics['loss']))
+
+        # save checkpoint
+        if val_metrics['accuracy'] > best_acc:
+          best_acc = val_metrics['accuracy']
+          _, state = nnx.split(model)
+          mngr.save(step, args=ocp.args.StandardSave(state))
+        metrics.reset()  # Reset the metrics for the val set.
+      if step > 5000:
+        break

@@ -26,9 +26,10 @@ def read_labels(file_path):
 # 图像数据
 x_train = read_images('data/train-images-idx3-ubyte.gz').reshape(-1, 28, 28)  # 重塑为 (样本数, 28, 28)
 x_val = read_images('data/t10k-images-idx3-ubyte.gz').reshape(-1, 28, 28)
-    
+np.save('data/x_train.npy', x_train)
+np.save('data/x_val.npy', x_val)
 # 标签数据
 y_train = read_labels('data/train-labels-idx1-ubyte.gz')
 y_val = read_labels('data/t10k-labels-idx1-ubyte.gz')
-
-np.savez_compressed('data/mnist.npz', x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val)
+np.save('data/y_train.npy', y_train)
+np.save('data/y_val.npy', y_val)
