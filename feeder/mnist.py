@@ -6,4 +6,4 @@ def transform(batch, dtype):
     return (batch[0][..., None] / 255.0).astype(dtype) , batch[1].astype(np.int32)
 
 def loader(data, label, dtype=np.float32):
-  return DataLoader(Dataset(data, label), strides=64, transform=partial(transform, dtype=dtype))
+  return DataLoader(Dataset(data, label), transform=partial(transform, dtype=dtype))
