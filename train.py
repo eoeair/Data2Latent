@@ -36,11 +36,9 @@ def pred_step(model: CNN, batch):
 if __name__ == '__main__':
   # hyper param
   best_acc = 0
-  batch_size = 256
-  dtype = jnp.bfloat16
-  
+
   # Instantiate
-  model = CNN(rngs=nnx.Rngs(0), dtype=dtype)
+  model = CNN(rngs=nnx.Rngs(0), dtype=jnp.bfloat16)
   tx = optax.adamw(learning_rate=0.01,b1=0.9)
   optimizer = nnx.Optimizer(model, tx, wrt=nnx.Param)
 
@@ -49,8 +47,8 @@ if __name__ == '__main__':
     loss=nnx.metrics.Average('loss'),
   )
   
-  train_loader = loader(data='data/x_train.npy', label='data/y_train.npy', dtype=dtype)
-  val_loader = loader(data='data/x_val.npy', label='data/y_val.npy', dtype=dtype)
+  train_loader = loader(data='data/x_train.npy', label='data/y_train.npy')
+  val_loader = loader(data='data/x_val.npy', label='data/y_val.npy')
 
   with ocp.CheckpointManager(os.path.join(os.getcwd(), 'checkpoints'), options = ocp.CheckpointManagerOptions(max_to_keep=1)) as mngr:
     for step, train_batch in enumerate(train_loader):
